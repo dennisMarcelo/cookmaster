@@ -41,8 +41,25 @@ const newRecipeValidation = (recipe) => {
   if (error) throw new CustomError('Invalid entries. Try again.', 400);
 };
 
+const isValiId = (params) => {
+  const { error } = Joi.object({ 
+    id: Joi
+      .string()
+      .hex()
+      .length(24)
+      .not()
+      .empty()
+      .required(),
+  }).validate(params);
+
+  if (error) {
+    throw new CustomError('recipe not found', 404);
+  } 
+};
+
 module.exports = {
   newUserValidation,
   loginValidation,
   newRecipeValidation,
+  isValiId,
 };
