@@ -26,6 +26,9 @@ app.route('/recipes')
   .post(validateJWT, recipesController.create)
   .get(recipesController.getAll);
 
+app.route('/recipes/:id')
+  .get(recipesController.getById);
+
 app.use(errorMiddleware);
 
 module.exports = app;
