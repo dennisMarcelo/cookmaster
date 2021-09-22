@@ -16,6 +16,14 @@ const create = async (recipe) => {
   };
 };
 
+const getAll = async () => {
+  const colletionRecipes = await getConnetionWithRecipesColletion();
+  const allRecipes = await colletionRecipes.find().toArray();
+  
+  return allRecipes;
+};
+
 module.exports = {
   create,
+  getAll,
 };
