@@ -23,7 +23,8 @@ app.route('/login')
   .post(userController.login);
 
 app.route('/recipes')
-  .post(validateJWT, recipesController.create);
+  .post(validateJWT, recipesController.create)
+  .get(recipesController.getAll);
 
 app.use(errorMiddleware);
 
