@@ -2,7 +2,6 @@ const jwt = require('jsonwebtoken');
 
 const tokenGenerator = (userOfDatabase) => {
   const { email, role, _id } = userOfDatabase;
-  console.log(email, role, _id);
 
   // projeto real utilizar vaiável de ambiente
   const secretKey = 'forever wakanda';
