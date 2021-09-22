@@ -6,7 +6,7 @@ const app = express();
 const userController = require('../controllers/userController');
 const recipesController = require('../controllers/recipesController');
 const errorMiddleware = require('../middlewares/error');
-const { validateJWT } = require('../middlewares/authorization');
+const { validateJWT, isAdminOrUser } = require('../middlewares/authorization');
 
 app.use(bodyParser.json());
 
@@ -27,7 +27,8 @@ app.route('/recipes')
   .get(recipesController.getAll);
 
 app.route('/recipes/:id')
-  .get(recipesController.getById);
+  .get(recipesController.getById)
+  .put(isAdminOrUser, recipesController.update);
 
 app.use(errorMiddleware);
 

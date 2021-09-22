@@ -31,8 +31,31 @@ const getById = async (id) => {
   return recipe;
 };
 
+const update = async (id, userId, newRecipe) => {
+  const colletionRecipes = await getConnetionWithRecipesColletion();
+
+  await colletionRecipes.updateOne(
+    { _id: ObjectId(id) },
+    { 
+      $set: { 
+        name: newRecipe.name, 
+        ingredients: newRecipe.ingredients, 
+        preparation: newRecipe.preparation, 
+      }, 
+    },
+    { upsert: false },
+  );
+
+  return {
+    _id: id,
+    ...newRecipe,
+    userId,
+  };
+};
+
 module.exports = {
   create,
   getAll,
   getById,
+  update,
 };

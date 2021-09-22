@@ -30,8 +30,19 @@ const getById = rescue(async (req, res) => {
   res.status(200).json(recipe);
 });
 
+const update = rescue(async (req, res) => {
+  const { id } = req.params;
+  const { userId } = req.user;
+  const { name, ingredients, preparation } = req.body;
+
+  const recipeUpdated = await recipesService.update(id, userId, { name, ingredients, preparation });
+
+  res.status(200).json(recipeUpdated);
+});
+
 module.exports = {
   create,
   getAll,
   getById,
+  update,
 };
