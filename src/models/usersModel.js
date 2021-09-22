@@ -18,15 +18,14 @@ const create = async ({ name, email, password, role }) => {
   };
 };
 
-const findByEmail = async (email) => {
+const findUserByEmail = async (email) => {
   const colletionUser = await getConnetionWithUserColletion();
   const user = await colletionUser.findOne({ email });
-  
-  if (user) return true;
-  return false;
+
+  return user;
 };
 
 module.exports = {
   create,
-  findByEmail,
+  findUserByEmail,
 };
