@@ -32,7 +32,7 @@ const isAdminOrUser = async (req, res, next) => {
     const recipe = await recipesModel.getById(id);
     
     if (role === 'admin' || recipe.userId === userId) {
-      req.user = { email, role, userId };
+      req.user = { email, role, userId: recipe.userId };
       return next();
     }
     
