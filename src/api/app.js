@@ -17,6 +17,9 @@ app.get('/', (request, response) => {
 app.route('/users')
   .post(userController.create);
 
+app.route('/login')
+  .post(userController.login);
+
 app.use(errorMiddleware);
 
 module.exports = app;
