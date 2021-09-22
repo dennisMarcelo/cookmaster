@@ -40,9 +40,23 @@ const update = rescue(async (req, res) => {
   res.status(200).json(recipeUpdated);
 });
 
+const remove = rescue(async (req, res) => {
+  const { id } = req.params;
+  
+  const removed = await recipesService.remove(id);
+  if (removed) return res.status(204).send();
+  res.status(400);
+});
+
+const addImage = rescue(async (req, res) => {
+  
+});
+
 module.exports = {
   create,
   getAll,
   getById,
   update,
+  remove,
+  addImage,
 };

@@ -1,5 +1,7 @@
 const express = require('express');
 const bodyParser = require('body-parser');
+const multer = require('multer');
+const path = require('path');
 
 const app = express();
 
@@ -9,12 +11,26 @@ const errorMiddleware = require('../middlewares/error');
 const { validateJWT, isAdminOrUser } = require('../middlewares/authorization');
 
 app.use(bodyParser.json());
+app.use(bodyParser.urlencoded({ extended: true }));
+app.use(express.static(path.join(__dirname, '../uploads')));
+
+// config multer
+const fileFilter = (req, file, cb) => {
+  if (file.mimetype !== 'image/jpeg') {
+    req.fileValidationError = true;
+    return cb(null, false);
+  }
+  cb(null, true);
+};
+const storage = multer.diskStorage({
+
+});
+const uploadFile = multer({ fileFilter, storage });
 
 // Não remover esse end-point, ele é necessário para o avaliador / R: não removido
 app.get('/', (request, response) => {
   response.send();
 });
-// Não remover esse end-point, ele é necessário para o avaliador/ R: não removido
 
 app.route('/users')
   .post(userController.create);
@@ -28,7 +44,11 @@ app.route('/recipes')
 
 app.route('/recipes/:id')
   .get(recipesController.getById)
-  .put(isAdminOrUser, recipesController.update);
+  .put(isAdminOrUser, recipesController.update)
+  .delete(isAdminOrUser, recipesController.remove);
+
+app.route('/recipes/:id/image/')
+  .put(isAdminOrUser, uploadFile.single('image'), recipesController.addImage);
 
 app.use(errorMiddleware);
 

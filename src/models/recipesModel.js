@@ -53,9 +53,18 @@ const update = async (id, userId, newRecipe) => {
   };
 };
 
+const remove = async (id) => {
+  const colletionRecipes = await getConnetionWithRecipesColletion();
+  const { result } = await colletionRecipes.deleteOne({ _id: ObjectId(id) });
+  
+  if (result.n > 0) return true;
+  return false;
+};
+
 module.exports = {
   create,
   getAll,
   getById,
   update,
+  remove,
 };
