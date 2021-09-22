@@ -4,7 +4,9 @@ const bodyParser = require('body-parser');
 const app = express();
 
 const userController = require('../controllers/userController');
+const recipesController = require('../controllers/recipesController');
 const errorMiddleware = require('../middlewares/error');
+const { validateJWT } = require('../middlewares/authorization');
 
 app.use(bodyParser.json());
 
@@ -19,6 +21,9 @@ app.route('/users')
 
 app.route('/login')
   .post(userController.login);
+
+app.route('/recipes')
+  .post(validateJWT, recipesController.create);
 
 app.use(errorMiddleware);
 
