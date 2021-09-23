@@ -61,10 +61,29 @@ const remove = async (id) => {
   return false;
 };
 
+const addImage = async (id, imageUrl) => {
+  const colletionRecipes = await getConnetionWithRecipesColletion();
+  const { result } = await colletionRecipes.updateOne(
+    { _id: ObjectId(id) },
+    {
+      $set: {
+        image: imageUrl,
+      },
+    },
+  );
+  
+  if (result.nModified > 0) {
+    return true;
+  }
+
+  return false;
+};
+
 module.exports = {
   create,
   getAll,
   getById,
   update,
   remove,
+  addImage,
 };
