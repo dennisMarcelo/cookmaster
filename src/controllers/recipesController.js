@@ -49,7 +49,6 @@ const remove = rescue(async (req, res) => {
 });
 
 const addImage = rescue(async (req, res) => {
-  console.log(req);
   const { imageUrl, recipe } = req;
   const { id } = req.params;
   
@@ -57,7 +56,7 @@ const addImage = rescue(async (req, res) => {
   if (imageUpdated) {
     return res.status(200).json({ ...recipe, image: imageUrl });
   }
-  
+
   res.status(400).json({ message: 'image not updated' });
 });
 
