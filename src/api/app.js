@@ -12,7 +12,7 @@ const { validateJWT, isAdminOrUser } = require('../middlewares/authorization');
 
 app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({ extended: true }));
-app.use(express.static(path.join(__dirname, '../uploads')));
+app.use('/images', express.static(path.join(__dirname, '../uploads')));
 
 // config multer
 const fileFilter = (req, file, cb) => {
