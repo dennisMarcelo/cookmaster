@@ -22,9 +22,15 @@ const fileFilter = (req, file, cb) => {
   }
   cb(null, true);
 };
-const storage = multer.diskStorage({
 
+const storage = multer.diskStorage({
+  destination: (req, file, cb) => { cb(null, path.join(__dirname, '../uploads')); },
+  filename: (req, file, cb) => { 
+    req.imageUrl = `localhost:3000/src/uploads/${req.params.id}.jpeg`;
+    cb(null, `${req.params.id}.jpeg`); 
+  },
 });
+
 const uploadFile = multer({ fileFilter, storage });
 
 // Não remover esse end-point, ele é necessário para o avaliador / R: não removido
