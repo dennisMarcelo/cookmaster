@@ -30,10 +30,17 @@ const remove = async (id) => {
   return removed;
 };
 
+const addImage = async (id, imageUrl) => {
+  const recipeUpdated = await recipesModel.addImage(id, imageUrl);
+
+  return recipeUpdated;
+};
+
 module.exports = {
   create,
   getAll,
   getById,
   update,
   remove,
+  addImage,
 };
