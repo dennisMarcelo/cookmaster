@@ -12,4 +12,4 @@ const URLmock = await DBServer.getUri();
 return MongoClient.connect(URLmock, OPTIONS)
 }
 
-module.exports = getConnection; 
+module.exports = {getConnection, DBServer}; 

@@ -4,7 +4,7 @@ const chaiHttp = require('chai-http');
 const sinon = require('sinon');
 const { MongoClient } = require('mongodb');
 
-const connectionMock = require('./connect')
+const {getConnection, DBServer} = require('./connect')
 
 const server  = require('../api/app');
 
@@ -19,9 +19,10 @@ describe('User routes', () => {
     let response = {};
     
     before(async () => {
-      const connection = await connectionMock()
+      const connection = await getConnection()
       sinon.stub(MongoClient, 'connect').resolves(connection);
-
+      
+      await connection.db(DB_NAME).collection('users').drop();
       response = await chai.request(server)
         .post('/users')
         .send(user1)
@@ -51,10 +52,11 @@ describe('User routes', () => {
     let response = {};
     
     before(async () => {
-      const connection = await connectionMock();
+      const connection = await getConnection();
 
       sinon.stub(MongoClient, 'connect').resolves(connection);
-
+      
+      await connection.db(DB_NAME).collection('users').drop();
       await connection.db(DB_NAME)
         .collection('users')
         .insertOne({
