@@ -17,18 +17,20 @@ const user1 = {name:"t'challa", email: 'black@panther.marvel.com', password:'wak
 describe('User routes', () => {
   describe('user created with success return', () => {
     let response = {};
+    let connection = null
     
     before(async () => {
-      const connection = await getConnection()
+      connection = await getConnection()
+
       sinon.stub(MongoClient, 'connect').resolves(connection);
       
-      await connection.db(DB_NAME).collection('users').drop();
       response = await chai.request(server)
         .post('/users')
         .send(user1)
     })
   
     after(async () => {
+      await connection.db(DB_NAME).collection('users').drop();
       MongoClient.connect.restore();
     })
 
@@ -50,13 +52,13 @@ describe('User routes', () => {
 
   describe('login with success return', () => {
     let response = {};
+    let connection = null;
     
     before(async () => {
-      const connection = await getConnection();
+      connection = await getConnection()
 
       sinon.stub(MongoClient, 'connect').resolves(connection);
       
-      await connection.db(DB_NAME).collection('users').drop();
       await connection.db(DB_NAME)
         .collection('users')
         .insertOne({
@@ -73,6 +75,7 @@ describe('User routes', () => {
     });
   
     after(async () => {
+      await connection.db(DB_NAME).collection('users').drop();
       MongoClient.connect.restore();
     });
   

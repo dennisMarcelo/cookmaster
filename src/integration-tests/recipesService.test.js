@@ -21,12 +21,12 @@ describe('Recipes routes', ()=>{
   describe('recipe created with success return', async()=>{
     let response = {};
     let token = null;
+    let connection = null
     
     before(async () => {
-      const connection = await getConnection();
-      
+      connection = await getConnection();
       sinon.stub(MongoClient, 'connect').resolves(connection);
-      // await connection.db(DB_NAME).collection('users').drop();
+
       await connection.db(DB_NAME)
       .collection('users')
       .insertOne({
@@ -49,6 +49,8 @@ describe('Recipes routes', ()=>{
     });
 
     after(async () => {
+      await connection.db(DB_NAME).collection('users').drop();
+      await connection.db(DB_NAME).collection('recipes').drop();
       MongoClient.connect.restore();
     });
 
