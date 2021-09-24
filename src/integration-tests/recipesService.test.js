@@ -3,7 +3,7 @@ const { expect } = require('chai');
 const chaiHttp = require('chai-http');
 const sinon = require('sinon');
 const { MongoClient } = require('mongodb');
-
+const { ObjectId } = require('mongodb');
 const {getConnection, DBServer} = require('./connect')
 
 const server  = require('../api/app');
@@ -120,4 +120,56 @@ describe('Recipes routes', ()=>{
       expect(response.body).to.be.length(2);
     });
   });
+
+  describe('route for get recipe by id return', () => {
+    let response = {};
+
+    let connection = null
+    
+    before(async () => {
+      connection = await getConnection();
+      sinon.stub(MongoClient, 'connect').resolves(connection);
+
+      await connection.db(DB_NAME)
+      .collection('recipes')
+      .insertMany([
+        {
+          _id: ObjectId(recipeId1),
+          name: recipe1.name,
+          ingredients: recipe1.ingredients,
+          preparation: recipe1.preparation,
+          userId: userId,
+        },
+        {
+          _id: ObjectId(recipeId2),
+          name: recipe2.name,
+          ingredients: recipe2.ingredients,
+          preparation: recipe2.preparation,
+          userId: userId,
+        }
+      ]);
+
+      response = await chai.request(server)
+        .get(`/recipes/${recipeId2}`)
+
+    });
+
+    after(async () => {
+      await connection.db(DB_NAME).collection('recipes').drop();
+      MongoClient.connect.restore();
+    });
+
+    it('status 200', async () => {
+      expect(response).to.have.status(200);
+    });
+
+    it('one object with recipe details', () => {
+      expect(response.body).to.be.an('object');
+      expect(response.body._id).to.be.equal(recipeId2);
+      expect(response.body.name).to.be.equal(recipe2.name);
+      expect(response.body.ingredients).to.be.equal(recipe2.ingredients);
+      expect(response.body.preparation).to.be.equal(recipe2.preparation);
+      expect(response.body.userId).to.be.equal(userId);
+    });
+  })
 })
