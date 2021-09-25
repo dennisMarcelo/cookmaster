@@ -12,6 +12,7 @@ const DB_NAME = 'Cookmaster';
 const recipeId1 = '6432ef45abaa7234551f25c1';
 const recipeId2 = '1232ffeb23ba57234551faf4';
 const userId = '614bf57bb41a7734551f85c1';
+const userId2 = '11fbf47bb41a77345b1faf23';
 const user1 = {name:"t'challa", email: 'black@panther.marvel.com', password:'wakanda forever'};
 const recipe1 = {
   name: 'grilled fish',
@@ -171,4 +172,66 @@ describe('Recipes routes', ()=>{
       expect(response.body.userId).to.be.equal(userId);
     });
   })
+
+  describe('recipe updated by admin return', () => {
+    let response = {};
+    let connection = null;
+    let token = null;
+
+    before(async () => {
+      connection = await getConnection();
+      sinon.stub(MongoClient, 'connect').resolves(connection);
+
+      await connection.db(DB_NAME)
+      .collection('recipes')
+      .insertOne(
+        {
+          _id: ObjectId(recipeId1),
+          name: recipe1.name,
+          ingredients: recipe1.ingredients,
+          preparation: recipe1.preparation,
+          userId: userId,
+        }
+      );
+
+      await connection.db(DB_NAME)
+      .collection('users')
+      .insertOne({
+        _id: userId2,
+        name: 'admin',
+        email: 'admin@admin.com',
+        password: 'admin123456',
+        role: 'admin'
+      });
+
+      token = await chai.request(server)
+      .post('/login')
+      .send({ email: 'admin@admin.com', password: 'admin123456' })
+      .then((res) => res.body.token);
+
+      response = await chai.request(server)
+        .put(`/recipes/${recipeId1}`)
+        .set('authorization', token)
+        .send({ name: 'edited', ingredients: 'edited', preparation: 'edited' })
+    });
+
+    after(async () => {
+      await connection.db(DB_NAME).collection('recipes').drop();
+      await connection.db(DB_NAME).collection('users').drop();
+      MongoClient.connect.restore();
+    });
+
+    it('status 200', async () => {
+      expect(response).to.have.status(200);
+    });
+
+    it('one object with recipe details', () => {
+      expect(response.body).to.be.an('object');
+      expect(response.body._id).to.be.equal(recipeId1);
+      expect(response.body.name).to.be.equal('edited');
+      expect(response.body.ingredients).to.be.equal('edited');
+      expect(response.body.preparation).to.be.equal('edited');
+      expect(response.body.userId).to.be.equal(userId);
+    });
+  });
 })
