@@ -21,7 +21,16 @@ const login = rescue(async (req, res) => {
   res.status(200).json(token);
 });
 
+const createNewAdmin = rescue(async (req, res) => {
+  newUserValidation(req.body);
+
+  const { name, email, password } = req.body;
+  const result = await userService.create({ name, email, password, role: 'admin' });
+  res.status(201).json(result);
+});
+
 module.exports = {
+  createNewAdmin,
   create,
   login,
 };
