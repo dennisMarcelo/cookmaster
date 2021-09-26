@@ -75,7 +75,50 @@ describe('Recipes routes', ()=>{
       expect(response.body.recipe.userId).to.equal(userId);
       expect(response.body.recipe).to.have.property('_id');
     })
-  })
+  });
+
+  describe('recipe with fields invalid return', () => {
+    let response = {};
+    let connection = null;
+
+    before(async () => {
+      connection = await getConnection();
+      sinon.stub(MongoClient, 'connect').resolves(connection);
+
+      await connection.db(DB_NAME)
+      .collection('users')
+      .insertOne({
+        _id: userId,
+        name: user1.name,
+        email: user1.email,
+        password: user1.password,
+        role: 'user'
+      });
+      
+      token = await chai.request(server)
+        .post('/login')
+        .send({ email: user1.email, password: user1.password })
+        .then((res) => res.body.token);
+
+      response = await chai.request(server)
+        .post('/recipes')
+        .set('authorization', token)
+        .send({})
+    });
+
+    after(async () => {
+      await connection.db(DB_NAME).collection('users').drop();
+      MongoClient.connect.restore();
+    });
+
+    it('status code 201', () => {  
+      expect(response).to.have.status(201);
+    });
+
+    it('message with text have informating the error', () => {
+      expect(response.body.message).to.be.equal('Invalid entries. Try again.');
+    })
+  });
 
   describe('route for get all recipes returns', () =>{
     let response = {};
