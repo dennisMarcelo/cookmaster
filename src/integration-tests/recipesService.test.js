@@ -5,6 +5,8 @@ const sinon = require('sinon');
 const { MongoClient } = require('mongodb');
 const { ObjectId } = require('mongodb');
 const {getConnection, DBServer} = require('./connect')
+const fs = require('fs')
+const path = require('path');
 
 const server  = require('../api/app');
 
@@ -286,5 +288,70 @@ describe('Recipes routes', ()=>{
     it('status 200', async () => {
       expect(response).to.have.status(204);
     });
+  });
+
+  describe('recipe deleted by admin return', () => {
+    let response = {};
+    let connection = null;
+    let token = null;
+
+    before(async () => {
+      connection = await getConnection();
+      sinon.stub(MongoClient, 'connect').resolves(connection);
+
+      await connection.db(DB_NAME)
+      .collection('recipes')
+      .insertOne(
+        {
+          _id: ObjectId(recipeId1),
+          name: recipe1.name,
+          ingredients: recipe1.ingredients,
+          preparation: recipe1.preparation,
+          userId: userId,
+        }
+      );
+
+      await connection.db(DB_NAME)
+      .collection('users')
+      .insertOne({
+        _id: userId2,
+        name: 'admin',
+        email: 'admin@admin.com',
+        password: 'admin123456',
+        role: 'admin'
+      });
+
+      token = await chai.request(server)
+      .post('/login')
+      .send({ email: 'admin@admin.com', password: 'admin123456' })
+      .then((res) => res.body.token);
+  
+      let image = fs.readFileSync(path.resolve(__dirname, '../uploads/ratinho.jpg'));
+   
+      response = await chai.request(server)
+        .put(`/recipes/${recipeId1}/image`)
+        .set('authorization', token)
+        .attach('image', image, 'ratinho.jpg');
+
+    });
+
+    after(async () => {
+      await connection.db(DB_NAME).collection('recipes').drop();
+      await connection.db(DB_NAME).collection('users').drop();
+      MongoClient.connect.restore();
+    });
+
+    it('status 200', async () => {
+      expect(response).to.have.status(200);
+    });
+
+    it ('one object with recipe details', () => {
+      expect(response.body._id).to.be.equal(recipeId1)
+      expect(response.body.name).to.be.equal(recipe1.name);
+      expect(response.body.ingredients).to.be.equal(recipe1.ingredients);
+      expect(response.body.preparation).to.be.equal(recipe1.preparation);
+      expect(response.body.userId).to.be.equal(userId);
+      expect(response.body.image).to.be.equal(`localhost:3000/src/uploads/${recipeId1}.jpeg`);
+    })
   });
 })
