@@ -112,7 +112,7 @@ describe('Recipes routes', ()=>{
     });
 
     it('status code 201', () => {  
-      expect(response).to.have.status(201);
+      expect(response).to.have.status(400);
     });
 
     it('message with text have informating the error', () => {
