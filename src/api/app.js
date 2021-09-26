@@ -8,7 +8,7 @@ const app = express();
 const userController = require('../controllers/userController');
 const recipesController = require('../controllers/recipesController');
 const errorMiddleware = require('../middlewares/error');
-const { validateJWT, isAdminOrUser } = require('../middlewares/authorization');
+const { validateJWT, isAdminOrUser, isAdmin } = require('../middlewares/authorization');
 
 app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({ extended: true }));
@@ -40,6 +40,9 @@ app.get('/', (request, response) => {
 
 app.route('/users')
   .post(userController.create);
+
+app.route('/users/admin')
+  .post(validateJWT, isAdmin, userController.createNewAdmin);
 
 app.route('/login')
   .post(userController.login);
