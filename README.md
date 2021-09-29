@@ -1,7 +1,5 @@
 # Requisitos do projeto
 
-## Requisitos Obrigatórios
-
 ### 1 - Crie um endpoint para o cadastro de usuários
 
 - A rota deve ser (`/users`).
